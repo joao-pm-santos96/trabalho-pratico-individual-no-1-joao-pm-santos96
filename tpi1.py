@@ -23,10 +23,10 @@ class MyTree(SearchTree):
         heuristic=problem.domain.heuristic(problem.initial, problem.goal))
 
         self.all_nodes = [root]
-        self.closed_nodes = []
+        self.closed_nodes = None
 
         self.solution_tree = None
-        self.used_shortcuts = []
+        self.used_shortcuts = None
 
     def astar_add_to_open(self,lnewnodes):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
@@ -42,13 +42,13 @@ class MyTree(SearchTree):
 
     def search2(self,atmostonce=False):
 
+        # if atmostonce:
+        self.closed_nodes = []
+
         while self.open_nodes != []:     
 
             nodeID = self.open_nodes.pop(0)
             node = self.all_nodes[nodeID] 
-
-            if atmostonce:
-                self.closed_nodes.append(node) 
 
             if self.problem.goal_test(node.state):
                 self.solution = node
@@ -61,20 +61,17 @@ class MyTree(SearchTree):
             for a in self.problem.domain.actions(node.state):                
                 newstate = self.problem.domain.result(node.state,a)
 
-                tree_search = newstate not in self.get_path(node)
-                graph_search = newstate not in [self.all_nodes[x].state for x in self.open_nodes] and newstate not in [x.state for x in self.closed_nodes]
-
-                if (tree_search and not atmostonce) or (graph_search and atmostonce):    
+                if newstate not in self.get_path(node):
 
                     newnode = MyNode(newstate,
                     nodeID,
                     depth=node.depth + 1,
                     cost=node.cost + self.problem.domain.cost(node.state, a),
                     heuristic=self.problem.domain.heuristic(newstate, self.problem.goal))
-
+ 
                     self.all_nodes.append(newnode)
                     lnewnodes.append(len(self.all_nodes)-1)
-
+                        
             if lnewnodes != []:
                 node.children = lnewnodes
 
@@ -85,8 +82,6 @@ class MyTree(SearchTree):
         return None
 
     def repeated_random_depth(self,numattempts=3,atmostonce=False):
-        #IMPLEMENT HERE
-        # pass
 
         best_cost = None
 
@@ -109,6 +104,7 @@ class MyTree(SearchTree):
         possibilities = [(a, b) for i, a in enumerate(solution_path) for b in reversed(solution_path[i+2:])]
 
         shortcuts = []
+        self.used_shortcuts = []
         for i, c1 in enumerate(solution_path):
             for c2 in reversed(solution_path[i+2:]):
 
