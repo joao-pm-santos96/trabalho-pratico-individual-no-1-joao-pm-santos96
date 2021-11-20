@@ -40,10 +40,9 @@ class MyTree(SearchTree):
                 self.propagate_eval_upwards(self.all_nodes[node.parent])
 
 
-    def search2(self,atmostonce=False):
+    def search2(self,atmostonce=False):  
 
-        # if atmostonce:
-        self.closed_nodes = []
+        closed = {}   
 
         while self.open_nodes != []:     
 
@@ -53,13 +52,22 @@ class MyTree(SearchTree):
             if self.problem.goal_test(node.state):
                 self.solution = node
                 self.terminals = len(self.open_nodes)+1
-                return self.get_path(node)
+                return self.get_path(node) 
 
             lnewnodes = []
-            self.non_terminals += 1
+            self.non_terminals += 1 
 
             for a in self.problem.domain.actions(node.state):                
                 newstate = self.problem.domain.result(node.state,a)
+
+                if atmostonce:                    
+                    if newstate in closed:
+                        if node.cost + self.problem.domain.cost(node.state, a) < closed[newstate]:
+                             closed[newstate] = node.cost + self.problem.domain.cost(node.state, a)
+                        else:
+                            continue 
+                    else:
+                        closed[newstate] = node.cost + self.problem.domain.cost(node.state, a) 
 
                 if newstate not in self.get_path(node):
 
@@ -71,7 +79,7 @@ class MyTree(SearchTree):
  
                     self.all_nodes.append(newnode)
                     lnewnodes.append(len(self.all_nodes)-1)
-                        
+
             if lnewnodes != []:
                 node.children = lnewnodes
 
