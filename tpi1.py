@@ -24,6 +24,7 @@ class MyTree(SearchTree):
 
         self.all_nodes = [root]
         self.closed_nodes = []
+        self.solution_tree = None
 
     def astar_add_to_open(self,lnewnodes):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
@@ -81,7 +82,21 @@ class MyTree(SearchTree):
 
     def repeated_random_depth(self,numattempts=3,atmostonce=False):
         #IMPLEMENT HERE
-        pass
+        # pass
+
+        best_cost = None
+        best_tree = None
+
+        for i in range(numattempts):
+            t = MyTree(self.problem, self.strategy, seed=i)
+            tree = t.search2()
+
+            if t.solution.cost < best_cost if best_cost is not None else True:
+                self.solution_tree = t
+                best_tree = tree
+                best_cost = t.solution.cost
+
+        return best_tree
 
     def make_shortcuts(self):
         #IMPLEMENT HERE
