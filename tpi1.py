@@ -8,7 +8,7 @@ class MyNode(SearchNode):
         self.depth = depth
         self.cost = cost
         self.heuristic = heuristic
-        self.eval = cost + heuristic
+        self.eval = round(cost + heuristic)
         self.children = None
 
 class MyTree(SearchTree):
@@ -32,11 +32,13 @@ class MyTree(SearchTree):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
 
     def propagate_eval_upwards(self,node):
+        
         if node.children:
             node.eval = sorted([self.all_nodes[n].eval for n in node.children])[0]
 
-            if node.parent:
+            if node.parent is not None:
                 self.propagate_eval_upwards(self.all_nodes[node.parent])
+
 
     def search2(self,atmostonce=False):
 
@@ -75,7 +77,7 @@ class MyTree(SearchTree):
 
             if lnewnodes != []:
                 node.children = lnewnodes
-                
+
             self.propagate_eval_upwards(node)
 
             self.add_to_open(lnewnodes)
@@ -139,7 +141,7 @@ class MyCities(Cidades):
 
     def maximum_tree_size(self,depth):   # assuming there is no loop prevention
         b = self.average_branching_factor
-        return (b ** (depth + 1) - 1)/(b - 1)
+        return round((b ** (depth + 1) - 1)/(b - 1))
 
         
 
