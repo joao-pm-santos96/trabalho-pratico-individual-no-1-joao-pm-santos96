@@ -136,7 +136,7 @@ class SearchTree:
             node = self.all_nodes[nodeID]
             line = indent+"["+str(nodeID)+"] "+node.state
             if showcost:
-                line += (' [' + str(node.cost) + ']')
+                line += (' [' + str(node.eval) + ']')
             print(line)
             if node.children==None:
                 return

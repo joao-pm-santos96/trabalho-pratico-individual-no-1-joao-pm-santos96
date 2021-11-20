@@ -115,6 +115,7 @@ print(t.non_terminals,t.terminals)
 
 t = MyTree(p,'A*')
 print(t.search2(True))
+t.show(showcost=True)
 print(t.all_nodes[0].heuristic)
 print(t.solution.cost)
 #print(t.all_nodes[0].eval)
