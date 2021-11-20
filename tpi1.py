@@ -106,8 +106,27 @@ class MyTree(SearchTree):
 
 class MyCities(Cidades):
 
+    @property
+    def average_branching_factor(self):
+
+        neighbors = {}
+        all_connections = [x[0] for x in self.connections] + [x[1] for x in self.connections]
+
+        for city in self.coordinates.keys():   
+            neighbors[city] = all_connections.count(city)
+
+        return sum(neighbors.values()) / len(neighbors.values())
+
     def maximum_tree_size(self,depth):   # assuming there is no loop prevention
-        #IMPLEMENT HERE
-        pass
+        # #IMPLEMENT HERE
+        # pass
+
+        b = self.average_branching_factor
+
+        return (b ** (depth + 1) - 1)/(b - 1)
+
+        
+
+    
 
 
