@@ -21,12 +21,10 @@ class MyTree(SearchTree):
         heuristic=problem.domain.heuristic(problem.initial, problem.goal))
 
         self.all_nodes = [root]
+        self.closed_nodes = []
 
     def astar_add_to_open(self,lnewnodes):
-        
-        self.open_nodes += lnewnodes
-
-        self.open_nodes.sort(key=lambda  node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
+        self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
 
     def propagate_eval_upwards(self,node):
         if node.children:
@@ -36,11 +34,14 @@ class MyTree(SearchTree):
                 self.propagate_eval_upwards(self.all_nodes[node.parent])
 
     def search2(self,atmostonce=False):
-        
+
         while self.open_nodes != []:     
 
             nodeID = self.open_nodes.pop(0)
-            node = self.all_nodes[nodeID]  
+            node = self.all_nodes[nodeID] 
+
+            if atmostonce:
+                self.closed_nodes.append(node) 
 
             if self.problem.goal_test(node.state):
                 self.solution = node
@@ -53,16 +54,22 @@ class MyTree(SearchTree):
             for a in self.problem.domain.actions(node.state):                
                 newstate = self.problem.domain.result(node.state,a)
 
-                if newstate not in self.get_path(node):
+                tree_search = newstate not in self.get_path(node)
+                graph_search = newstate not in [self.all_nodes[x].state for x in self.open_nodes] and newstate not in [x.state for x in self.closed_nodes]
+
+                if (tree_search and not atmostonce) or (graph_search and atmostonce):    
+
                     newnode = MyNode(newstate,
                     nodeID,
                     cost=node.cost + self.problem.domain.cost(node.state, a),
                     heuristic=self.problem.domain.heuristic(newstate, self.problem.goal))
-                    
+
                     self.all_nodes.append(newnode)
                     lnewnodes.append(len(self.all_nodes)-1)
 
-            node.children = lnewnodes
+            if lnewnodes != []:
+                node.children = lnewnodes
+                
             self.propagate_eval_upwards(node)
 
             self.add_to_open(lnewnodes)
