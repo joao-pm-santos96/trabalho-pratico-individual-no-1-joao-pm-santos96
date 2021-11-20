@@ -2,11 +2,13 @@ from tree_search import *
 from cidades import *
 
 class MyNode(SearchNode):
-    def __init__(self,state,parent,arg3=None,cost=0, evalfunc=0):
+    def __init__(self,state,parent,arg3=None,cost=0, heuristic=0):
         super().__init__(state,parent)
 
         self.cost = cost
-        self.evalfunc = evalfunc
+        self.heuristic = heuristic
+        self.eval = cost + heuristic
+        self.children = None
 
 class MyTree(SearchTree):
 
@@ -14,18 +16,24 @@ class MyTree(SearchTree):
         super().__init__(problem,strategy,seed)
 
         # Overwrite to use correct class
-        root = MyNode(problem.initial, None)
+        root = MyNode(problem.initial, None, 
+        cost=0, 
+        heuristic=problem.domain.heuristic(problem.initial, problem.goal))
+
         self.all_nodes = [root]
 
     def astar_add_to_open(self,lnewnodes):
         
         self.open_nodes += lnewnodes
 
-        self.open_nodes.sort(key=lambda  node: self.all_nodes[node].evalfunc + self.all_nodes[node].cost)
+        self.open_nodes.sort(key=lambda  node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
 
     def propagate_eval_upwards(self,node):
-        #IMPLEMENT HERE
-        pass
+        if node.children:
+            node.eval = sorted([self.all_nodes[n].eval for n in node.children])[0]
+
+            if node.parent:
+                self.propagate_eval_upwards(self.all_nodes[node.parent])
 
     def search2(self,atmostonce=False):
         
@@ -49,10 +57,13 @@ class MyTree(SearchTree):
                     newnode = MyNode(newstate,
                     nodeID,
                     cost=node.cost + self.problem.domain.cost(node.state, a),
-                    evalfunc=self.problem.domain.heuristic(newstate, self.problem.goal))
+                    heuristic=self.problem.domain.heuristic(newstate, self.problem.goal))
                     
                     self.all_nodes.append(newnode)
                     lnewnodes.append(len(self.all_nodes)-1)
+
+            node.children = lnewnodes
+            self.propagate_eval_upwards(node)
 
             self.add_to_open(lnewnodes)
 
