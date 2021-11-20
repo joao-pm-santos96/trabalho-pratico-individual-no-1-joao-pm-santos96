@@ -24,7 +24,9 @@ class MyTree(SearchTree):
 
         self.all_nodes = [root]
         self.closed_nodes = []
+
         self.solution_tree = None
+        self.used_shortcuts = None
 
     def astar_add_to_open(self,lnewnodes):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
@@ -85,18 +87,16 @@ class MyTree(SearchTree):
         # pass
 
         best_cost = None
-        best_tree = None
 
         for i in range(numattempts):
             t = MyTree(self.problem, self.strategy, seed=i)
-            tree = t.search2()
+            tree = t.search2(atmostonce=atmostonce)
 
             if t.solution.cost < best_cost if best_cost is not None else True:
                 self.solution_tree = t
-                best_tree = tree
                 best_cost = t.solution.cost
 
-        return best_tree
+        return self.solution_tree.get_path(self.solution_tree.solution)
 
     def make_shortcuts(self):
         #IMPLEMENT HERE
@@ -118,11 +118,7 @@ class MyCities(Cidades):
         return sum(neighbors.values()) / len(neighbors.values())
 
     def maximum_tree_size(self,depth):   # assuming there is no loop prevention
-        # #IMPLEMENT HERE
-        # pass
-
         b = self.average_branching_factor
-
         return (b ** (depth + 1) - 1)/(b - 1)
 
         
