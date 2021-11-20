@@ -2,9 +2,10 @@ from tree_search import *
 from cidades import *
 
 class MyNode(SearchNode):
-    def __init__(self,state,parent,arg3=None,cost=0, heuristic=0):
+    def __init__(self,state,parent,depth=0,cost=0, heuristic=0):
         super().__init__(state,parent)
 
+        self.depth = depth
         self.cost = cost
         self.heuristic = heuristic
         self.eval = cost + heuristic
@@ -17,6 +18,7 @@ class MyTree(SearchTree):
 
         # Overwrite to use correct class
         root = MyNode(problem.initial, None, 
+        depth=0,
         cost=0, 
         heuristic=problem.domain.heuristic(problem.initial, problem.goal))
 
@@ -61,6 +63,7 @@ class MyTree(SearchTree):
 
                     newnode = MyNode(newstate,
                     nodeID,
+                    depth=node.depth + 1,
                     cost=node.cost + self.problem.domain.cost(node.state, a),
                     heuristic=self.problem.domain.heuristic(newstate, self.problem.goal))
 
