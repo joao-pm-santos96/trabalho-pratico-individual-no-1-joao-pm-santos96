@@ -26,7 +26,7 @@ class MyTree(SearchTree):
         self.closed_nodes = []
 
         self.solution_tree = None
-        self.used_shortcuts = None
+        self.used_shortcuts = []
 
     def astar_add_to_open(self,lnewnodes):
         self.open_nodes = sorted(self.open_nodes + lnewnodes, key = lambda node: self.all_nodes[node].heuristic + self.all_nodes[node].cost)
@@ -99,10 +99,30 @@ class MyTree(SearchTree):
         return self.solution_tree.get_path(self.solution_tree.solution)
 
     def make_shortcuts(self):
-        #IMPLEMENT HERE
-        pass
+        # Reference: https://stackoverflow.com/questions/40438676/combinations-of-two-non-consecutive-items
+        
+        connections = [(conn[0], conn[1]) for conn in self.problem.domain.connections]
+
+        solution_path = self.get_path(self.solution)
+        possibilities = [(a, b) for i, a in enumerate(solution_path) for b in reversed(solution_path[i+2:])]
+
+        shortcuts = []
+        for i, c1 in enumerate(solution_path):
+            for c2 in reversed(solution_path[i+2:]):
+
+                if (c1, c2) in connections or (c2, c1) in connections:
+                    shortcuts.append((c1,c2))
+                    break
 
 
+        for c1, c2 in shortcuts:
+            if c1 in solution_path and c2 in solution_path:
+
+                self.used_shortcuts.append((c1, c2))
+                del solution_path[solution_path.index(c1)+1:solution_path.index(c2)]
+
+
+        return solution_path
 
 class MyCities(Cidades):
 
