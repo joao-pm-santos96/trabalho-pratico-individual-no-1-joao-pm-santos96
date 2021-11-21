@@ -1,3 +1,5 @@
+# Discussed with João Carrasco Ferreira, 80305
+
 from tree_search import *
 from cidades import *
 
@@ -47,8 +49,8 @@ class MyTree(SearchTree):
         while self.open_nodes != []:     
 
             nodeID = self.open_nodes.pop(0)
-            node = self.all_nodes[nodeID]                 # node.children = sorted(lnewnodes, key= lambda node: self.all_nodes[node].eval, reverse=True)
-
+            node = self.all_nodes[nodeID]                 
+            
             if self.problem.goal_test(node.state):
                 self.solution = node
                 self.terminals = len(self.open_nodes)+1
@@ -62,13 +64,26 @@ class MyTree(SearchTree):
 
             for a in self.problem.domain.actions(node.state):                
                 newstate = self.problem.domain.result(node.state,a)
-
+                
                 if atmostonce:                    
-                    if newstate in closed: # Check if newstate has already been visited
+                    if newstate in closed.keys(): # Check if newstate has already been visited
                         
-                        # If it has been visited, check if current path has lower cost. If so, update
+                        # If it has been visited, check if current path has lower cost. If so, update.
                         if node.cost + self.problem.domain.cost(node.state, a) < closed[newstate]:
-                             closed[newstate] = node.cost + self.problem.domain.cost(node.state, a)
+                            closed[newstate] = node.cost + self.problem.domain.cost(node.state, a)
+                            
+
+                            
+                            
+                            
+                            for idx, node_id_js in enumerate(self.open_nodes):
+
+                                if self.all_nodes[node_id_js].state == newstate:
+
+                                    self.open_nodes.pop(idx)
+
+                            
+
                         else:
                             continue 
                     else:
@@ -81,7 +96,8 @@ class MyTree(SearchTree):
                     nodeID,
                     depth=node.depth + 1,
                     cost=node.cost + self.problem.domain.cost(node.state, a),
-                    heuristic=self.problem.domain.heuristic(newstate, self.problem.goal))
+                    heuristic=self.problem.domain.heuristic(newstate, self.problem.goal)
+                    )
  
                     self.all_nodes.append(newnode)
                     lnewnodes.append(len(self.all_nodes)-1)
