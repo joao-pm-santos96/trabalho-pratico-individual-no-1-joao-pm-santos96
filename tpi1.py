@@ -1,4 +1,6 @@
-# Discussed with João Carrasco Ferreira, 80305
+# Done by: [João Pedro Martins dos Santos, 76912]
+# Discussed with: [João Carrasco Ferreira, 80305]
+# Sources can be found accross the methods they were used
 
 from tree_search import *
 from cidades import *
@@ -36,7 +38,6 @@ class MyTree(SearchTree):
 
     def propagate_eval_upwards(self,node):
         # Source https://github.com/miguelmatos-ua/ia/blob/master/tpi/tpi1/tpi1.py
-
         if node.children:
             node.eval = sorted([self.all_nodes[n].eval for n in node.children])[0]
             if node.parent is not None:
@@ -68,22 +69,15 @@ class MyTree(SearchTree):
                 if atmostonce:                    
                     if newstate in closed.keys(): # Check if newstate has already been visited
                         
-                        # If it has been visited, check if current path has lower cost. If so, update.
                         if node.cost + self.problem.domain.cost(node.state, a) < closed[newstate]:
-                            closed[newstate] = node.cost + self.problem.domain.cost(node.state, a)
-                            
 
-                            
-                            
-                            
-                            for idx, node_id_js in enumerate(self.open_nodes):
+                            # If it has been visited, check if current path has lower cost. If so, update...
+                            closed[newstate] = node.cost + self.problem.domain.cost(node.state, a)                   
 
-                                if self.all_nodes[node_id_js].state == newstate:
-
-                                    self.open_nodes.pop(idx)
-
-                            
-
+                            # ...and remove from the open ones
+                            for open_id in self.open_nodes:
+                                if self.all_nodes[open_id].state == newstate:
+                                    self.open_nodes.remove(open_id)
                         else:
                             continue 
                     else:
